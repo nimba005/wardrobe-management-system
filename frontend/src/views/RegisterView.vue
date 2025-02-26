@@ -23,3 +23,4 @@ const register = async () => {
   await authStore.register({ name: name.value, email: email.value, password: password.value });
 };
 </script>
+
