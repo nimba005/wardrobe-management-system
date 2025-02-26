@@ -12,12 +12,20 @@ class ClothingController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        // Retrieve all clothing items belonging to the authenticated user
-        return response()->json(Clothing::where('user_id', Auth::id())->get());
+    public function index(Request $request) {
+        $query = Clothing::where('user_id', Auth::id());
+    
+        if ($request->has('search')) {
+            $query->where('name', 'LIKE', '%' . $request->search . '%');
+        }
+    
+        if ($request->has('category')) {
+            $query->where('category', $request->category);
+        }
+    
+        return response()->json($query->get());
     }
-
+    
     /**
      * Store a newly created resource in storage.
      */
@@ -84,7 +92,7 @@ class ClothingController extends Controller
         // Update clothing item
         $item->update($request->all());
 
-        return response()->json($item);
+        return response()->json(['message' => 'Clothing item updated successfully', 'data' => $item]);
     }
 
     /**
@@ -103,4 +111,3 @@ class ClothingController extends Controller
         return response()->json(['message' => 'Item deleted successfully']);
     }
 }
-
