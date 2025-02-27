@@ -1,36 +1,45 @@
+// src/stores/auth.ts
 import { defineStore } from "pinia";
-import axios from "axios";
+import api from "../api";
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
-    user: null as any, // Explicitly type user as any, adjust based on actual user structure
+    user: null as any, 
     token: localStorage.getItem("token") || null,
   }),
   actions: {
     async register(userData: { name: string; email: string; password: string }) {
-      const response = await axios.post("/api/register", userData);
-      this.token = response.data.token;
-      if (this.token) {
-        localStorage.setItem("token", this.token);
-      } else {
-        localStorage.removeItem("token");
+      try {
+        const response = await api.post("/register", userData);
+        this.token = response.data.token;
+        if (this.token) {
+          localStorage.setItem("token", this.token);
+        } else {
+          localStorage.removeItem("token");
+        }
+        this.getUser();
+      } catch (error) {
+        console.error("Registration error:", error);
       }
-      this.getUser();
     },
     async login(credentials: { email: string; password: string }) {
-      const response = await axios.post("/api/login", credentials);
-      this.token = response.data.token;
-      if (this.token) {
-        localStorage.setItem("token", this.token);
-      } else {
-        localStorage.removeItem("token");
+      try {
+        const response = await api.post("/login", credentials);
+        this.token = response.data.token;
+        if (this.token) {
+          localStorage.setItem("token", this.token);
+        } else {
+          localStorage.removeItem("token");
+        }
+        this.getUser();
+      } catch (error) {
+        console.error("Login error:", error);
       }
-      this.getUser();
     },
     async getUser() {
       if (!this.token) return;
       try {
-        const response = await axios.get("/api/user", {
+        const response = await api.get("/user", {
           headers: { Authorization: `Bearer ${this.token}` },
         });
         this.user = response.data;
@@ -41,7 +50,7 @@ export const useAuthStore = defineStore("auth", {
     },
     async logout() {
       try {
-        await axios.post("/api/logout", null, {
+        await api.post("/logout", null, {
           headers: { Authorization: `Bearer ${this.token}` },
         });
       } catch (error) {
