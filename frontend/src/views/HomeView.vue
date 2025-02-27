@@ -10,7 +10,7 @@ const router = useRouter();
 
 const selectedCategory = ref("");
 const searchQuery = ref("");
-const newClothing = ref({ name: "", category: "tops" });
+const newClothing = ref({ name: "", category: "tops", imageUrl: "" });
 const editingItem = ref(null);
 const errorMessage = ref("");
 
@@ -19,12 +19,12 @@ onMounted(() => {
 });
 
 const addClothing = async () => {
-  if (!newClothing.value.name.trim()) {
-    errorMessage.value = "Clothing name cannot be empty.";
+  if (!newClothing.value.name.trim() || !newClothing.value.imageUrl.trim()) {
+    errorMessage.value = "Clothing name and image URL cannot be empty.";
     return;
   }
   await clothingStore.addItem(newClothing.value);
-  newClothing.value = { name: "", category: "tops" };
+  newClothing.value = { name: "", category: "tops", imageUrl: "" };
   errorMessage.value = "";
 };
 
@@ -37,8 +37,8 @@ const editClothing = (item) => {
 };
 
 const updateClothing = async () => {
-  if (!editingItem.value.name.trim()) {
-    errorMessage.value = "Clothing name cannot be empty.";
+  if (!editingItem.value.name.trim() || !editingItem.value.imageUrl.trim()) {
+    errorMessage.value = "Clothing name and image URL cannot be empty.";
     return;
   }
   await clothingStore.updateItem(editingItem.value);
@@ -65,7 +65,7 @@ const logout = () => {
 
 <template>
   <main class="home-container">
-    <h2 class="text-4xl font-bold text-center mb-6">Manage Your Wardrobe</h2>
+    <h2 class="text-4xl font-bold text-center mb-6 text-white">Manage Your Wardrobe</h2>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
       <input v-model="searchQuery" placeholder="Search clothes..." class="border p-3 rounded w-full shadow" />
@@ -80,6 +80,7 @@ const logout = () => {
     <div class="bg-gray-100 p-6 rounded shadow mb-6">
       <h2 class="text-2xl font-semibold mb-2">Add New Clothing</h2>
       <input v-model="newClothing.name" placeholder="Clothing Name" class="border p-3 w-full rounded mb-3 shadow" />
+      <input v-model="newClothing.imageUrl" placeholder="Image URL" class="border p-3 w-full rounded mb-3 shadow" />
       <select v-model="newClothing.category" class="border p-3 w-full rounded mb-3 shadow">
         <option value="tops">Tops</option>
         <option value="bottoms">Bottoms</option>
@@ -91,11 +92,12 @@ const logout = () => {
       <p v-if="errorMessage" class="text-red-500 mt-2">{{ errorMessage }}</p>
     </div>
 
-    <div v-if="filteredItems.length === 0" class="text-center text-gray-500">No items found.</div>
-    <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <li v-for="item in filteredItems" :key="item.id" class="border rounded p-6 shadow flex justify-between items-center">
-        <span class="font-semibold">{{ item.name }} - {{ item.category }}</span>
-        <div class="flex gap-2">
+    <div v-if="filteredItems.length === 0" class="text-center text-white">No items found.</div>
+    <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <li v-for="item in filteredItems" :key="item.id" class="border rounded p-6 shadow bg-white flex flex-col items-center">
+        <img :src="item.imageUrl" alt="Clothing Image" class="w-full h-40 object-cover rounded mb-4 shadow" />
+        <span class="font-semibold text-lg">{{ item.name }} - {{ item.category }}</span>
+        <div class="flex gap-2 mt-3">
           <button @click="editClothing(item)" class="bg-yellow-500 text-white px-3 py-2 rounded hover:bg-yellow-600">
             Edit
           </button>
@@ -110,6 +112,7 @@ const logout = () => {
       <div class="bg-white p-8 rounded shadow-lg">
         <h3 class="text-2xl font-bold mb-4">Edit Item</h3>
         <input v-model="editingItem.name" class="border p-3 w-full rounded mb-4 shadow" />
+        <input v-model="editingItem.imageUrl" class="border p-3 w-full rounded mb-4 shadow" />
         <select v-model="editingItem.category" class="border p-3 w-full rounded mb-4 shadow">
           <option value="tops">Tops</option>
           <option value="bottoms">Bottoms</option>
@@ -134,6 +137,6 @@ const logout = () => {
   height: 100vh;
   padding: 20px;
   overflow-y: auto;
-  background-color: #f8f9fa;
+  background: url("/alejo-reinoso--IlmDnJg5cg-unsplash.jpg") center/cover no-repeat;
 }
 </style>
